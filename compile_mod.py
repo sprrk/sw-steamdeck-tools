@@ -51,6 +51,7 @@ def compile(definition: str):
     xml_file = definition
 
     lua_files = [f"{path}/{x}" for x in files if x.endswith(".lua")]
+    ogg_files = [f"{path}/{x}" for x in files if x.endswith(".ogg")]
     dae_files = [f"{path}/{x}" for x in files if x.endswith(".dae")]
 
     # Compile meshes first
@@ -60,7 +61,7 @@ def compile(definition: str):
         mesh_files.append(dae_file.replace('.dae', '.mesh'))
 
     # Compile the mod itself
-    asset_files = mesh_files + lua_files
+    asset_files = mesh_files + lua_files + ogg_files
     _compile_mod(definition=definition, assets=asset_files)
 
 if __name__ == '__main__':
