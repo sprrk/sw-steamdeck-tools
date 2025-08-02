@@ -230,22 +230,20 @@ class ModBuilder:
 
             dae_files = [x for x in os.listdir(f"src/{component_dir}") if x.endswith(".dae")]
             for filename in dae_files:
-                mesh_task = asyncio.create_task(self._compile_component_mesh(f"src/{component_dir}/{filename}", component_build_path), name=component_dir)
+                mesh_task = self._compile_component_mesh(f"src/{component_dir}/{filename}", component_build_path)
                 mesh_tasks.append(mesh_task)
 
-            bin_task = asyncio.create_task(self._build_component(component_dir, component_build_path), name=f"{component_dir}.bin")
+            bin_task = self._build_component(component_dir, component_build_path)
             bin_tasks.append(bin_task)
 
         with Progress(transient=True) as progress:
             mesh_progress_task = progress.add_task("Compiling component meshes...", total=len(mesh_tasks))
             async for task in asyncio.as_completed(mesh_tasks):
-                progress.console.print(f"Compiled meshes: [yellow]{task.get_name()}[/yellow]")
                 progress.update(mesh_progress_task, advance=1)
 
         with Progress(transient=True) as progress:
             bin_progress_task = progress.add_task("Compiling component binaries...", total=len(bin_tasks))
             async for task in asyncio.as_completed(bin_tasks):
-                progress.console.print(f"Compiled component: [yellow]{task.get_name()}[/yellow]")
                 progress.update(bin_progress_task, advance=1)
 
     async def run(self):
