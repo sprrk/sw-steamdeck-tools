@@ -18,6 +18,7 @@ def set_env():
 MOD_COMPILER_CMD = ["/home/deck/.local/share/Steam/steamapps/common/Proton 9.0 (Beta)/proton", "run", "/home/deck/.steam/steam/steamapps/common/Stormworks/sdk/component_mod_compiler.com"]
 MESH_COMPILER_CMD = ["/home/deck/.local/share/Steam/steamapps/common/Proton 9.0 (Beta)/proton", "run", "/home/deck/.steam/steam/steamapps/common/Stormworks/sdk/mesh_compiler.com"]
 
+
 def _compile_mesh(mesh_path: str):
     rprint(f"Compiling mesh [bold]{mesh_path}[/bold]...")
     base_path = "/".join(mesh_path.split("/")[:-1])
@@ -32,7 +33,7 @@ def _compile_mod(definition: str, assets: tuple[str]):
     bin_path = definition.replace(".xml", ".bin")
     if os.path.exists(bin_path):
         filename = bin_path.split("/")[-1]
-        output_dir = "data/components"
+        output_dir = "build/components"
         output_path = f"{output_dir}/{filename}"
         Path(output_dir).mkdir(parents=True, exist_ok=True)
         Path(bin_path).rename(output_path)
