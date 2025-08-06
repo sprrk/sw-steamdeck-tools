@@ -196,7 +196,7 @@ class ModBuilder:
         files = os.listdir(f"src/{component_dir}")
 
         lua_files = [x for x in files if x.endswith(".lua")]
-        ogg_files = [x for x in files if x.endswith(".ogg")]
+        ogg_files = sorted([x for x in files if x.endswith(".ogg")])
 
         for filename in [definition_file] + ogg_files + lua_files:
             shutil.copy(f"src/{component_dir}/{filename}", f"{component_build_path}/{filename}")
