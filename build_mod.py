@@ -219,7 +219,7 @@ class ModBuilder:
     async def _build_components(self):
         rprint("Compiling component binaries...")
 
-        component_dirs = [x for x in os.listdir(f"{self.config.project_path}/src") if x != "legacy"]
+        component_dirs = [x for x in os.listdir(f"{self.config.project_path}/src") if x not in ["legacy", "lib"]]
 
         mesh_tasks = []
         bin_tasks = []
