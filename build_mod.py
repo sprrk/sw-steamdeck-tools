@@ -192,18 +192,38 @@ class ModBuilder:
 
         return xml_files[0]
 
-    def _copy_component_assets(self, definition_file: str, component_dir: str, component_build_path: str) -> None:
+    def _get_component_lua_file_path(self, definition_file: str, component_dir: str) -> str | None:
         files = os.listdir(f"src/{component_dir}")
 
         lua_files = [x for x in files if x.endswith(".lua")]
+        if not lua_files:
+            return None
+
+        filename = definition_file.replace(".xml", ".lua")
+        if filename in lua_files:
+            return filename
+        else:
+            return None
+
+    async def _compile_component_lua(self, filename: str, component_dir: str, component_build_path: str):
+        cmd = ["darklua", "process"] + [f"src/{component_dir}/{filename}"] + [f"{component_build_path}/{filename}"]
+        process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
+        return process.returncode
+
+    def _copy_component_assets(self, definition_file: str, component_dir: str, component_build_path: str) -> None:
+        files = os.listdir(f"src/{component_dir}")
+
         ogg_files = sorted([x for x in files if x.endswith(".ogg")])
 
-        for filename in [definition_file] + ogg_files + lua_files:
+        for filename in [definition_file] + ogg_files:
             shutil.copy(f"src/{component_dir}/{filename}", f"{component_build_path}/{filename}")
 
-    async def _build_component(self, component_dir: str, component_build_path: str) -> None:
-        definition_file = self._get_component_definition_file_path(component_dir)
-
+    async def _build_component(self, definition_file: str, component_dir: str, component_build_path: str) -> None:
         self._copy_component_assets(definition_file, component_dir, component_build_path)
 
         assets = os.listdir(component_build_path)
@@ -222,9 +242,12 @@ class ModBuilder:
         component_dirs = [x for x in os.listdir(f"{self.config.project_path}/src") if x not in ["legacy", "lib"]]
 
         mesh_tasks = []
+        lua_tasks = []
         bin_tasks = []
 
         for component_dir in component_dirs:
+            definition_file = self._get_component_definition_file_path(component_dir)
+
             component_build_path = f"/tmp/sw-mod-builder/{self.config.build_name}/build/components/{component_dir}"
             Path(component_build_path).mkdir(parents=True, exist_ok=True)
 
@@ -233,13 +256,23 @@ class ModBuilder:
                 mesh_task = self._compile_component_mesh(f"src/{component_dir}/{filename}", component_build_path)
                 mesh_tasks.append(mesh_task)
 
-            bin_task = self._build_component(component_dir, component_build_path)
+            lua_file = self._get_component_lua_file_path(definition_file, component_dir)
+            if lua_file:
+                lua_task = self._compile_component_lua(lua_file, component_dir, component_build_path)
+                lua_tasks.append(lua_task)
+
+            bin_task = self._build_component(definition_file, component_dir, component_build_path)
             bin_tasks.append(bin_task)
 
         with Progress(transient=True) as progress:
             mesh_progress_task = progress.add_task("Compiling component meshes...", total=len(mesh_tasks))
             async for task in asyncio.as_completed(mesh_tasks):
                 progress.update(mesh_progress_task, advance=1)
+
+        with Progress(transient=True) as progress:
+            lua_progress_task = progress.add_task("Compiling component lua...", total=len(lua_tasks))
+            async for task in asyncio.as_completed(lua_tasks):
+                progress.update(lua_progress_task, advance=1)
 
         with Progress(transient=True) as progress:
             bin_progress_task = progress.add_task("Compiling component binaries...", total=len(bin_tasks))
