@@ -46,7 +46,7 @@ class Config:
 
 def _load_config(project_dir: str) -> Config:
     if project_dir.startswith(".."):
-        rprint(f"[red]Error:[/red] Path traversal upwards is not supported.")
+        rprint("[red]Error:[/red] Path traversal upwards is not supported.")
         sys.exit(1)
 
     if project_dir == ".":
@@ -56,7 +56,7 @@ def _load_config(project_dir: str) -> Config:
 
     config_file = f"{project_path}/modconfig.toml"
     if not Path(config_file).is_file():
-        rprint(f"[red]Error:[/red] Config file does not exist.")
+        rprint("[red]Error:[/red] Config file does not exist.")
         sys.exit(1)
 
     with open(config_file, "rb") as f:
