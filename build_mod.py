@@ -4,7 +4,6 @@
 # ///
 
 import click
-import subprocess
 import os
 from rich import print as rprint
 from pathlib import Path
