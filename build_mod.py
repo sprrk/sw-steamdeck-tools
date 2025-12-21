@@ -15,12 +15,12 @@ import asyncio
 from rich.progress import Progress
 
 MESH_COMPILER_CMD = [
-    "/home/deck/.local/share/Steam/steamapps/common/Proton 9.0 (Beta)/proton",
+    "/home/deck/.local/share/Steam/steamapps/common/Proton 10.0/proton",
     "run",
     "/home/deck/.steam/steam/steamapps/common/Stormworks/sdk/mesh_compiler.com",
 ]
 MOD_COMPILER_CMD = [
-    "/home/deck/.local/share/Steam/steamapps/common/Proton 9.0 (Beta)/proton",
+    "/home/deck/.local/share/Steam/steamapps/common/Proton 10.0/proton",
     "run",
     "/home/deck/.steam/steam/steamapps/common/Stormworks/sdk/component_mod_compiler.com",
 ]
