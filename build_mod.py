@@ -299,7 +299,7 @@ class ModBuilder:
         component_dirs = [
             x
             for x in os.listdir(f"{self.config.project_path}/src")
-            if x not in ["legacy", "lib"]
+            if x not in ["legacy", "lib", "mc-scripts", "mc_scripts", "scripts"]
         ]
 
         mesh_tasks = []
